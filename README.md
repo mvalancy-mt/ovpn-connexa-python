@@ -97,31 +97,12 @@ This Python client provides programmatic access to all Cloud Connexa features, a
 
 ## Quick Start
 
-```python
-from cloudconnexa import CloudConnexaClient
-
-# Initialize client with environment variables
-client = CloudConnexaClient()
-
-# Or with explicit configuration
-client = CloudConnexaClient(
-    api_url="https://api.cloudconnexa.com",
-    client_id="your_client_id",
-    client_secret="your_client_secret",
-    api_version="1.1.0"  # Optional, defaults to latest
-)
-
-# List networks
-networks = client.networks.list()
-for network in networks["data"]:
-    print(f"Network: {network.name}")
-
-# Create a new network
-new_network = client.networks.create(
-    name="My Network",
-    description="A test network"
-)
+```bash
+# First-time setup made easy
+./start.sh
 ```
+
+This script will help you set up the development environment and run tests to verify your installation.
 
 ## Installation
 
@@ -134,13 +115,15 @@ pip install cloudconnexa
 ```bash
 git clone https://github.com/yourusername/ovpn-connexa.git
 cd ovpn-connexa
-pip install -e ".[dev]"
+./start.sh
 ```
 
 ### As a Git Submodule
 ```bash
 git submodule add https://github.com/yourusername/ovpn-connexa.git libs/ovpn-connexa
 git submodule update --init --recursive
+cd libs/ovpn-connexa
+./start.sh
 ```
 
 ## Configuration
@@ -265,22 +248,18 @@ cloudconnexa/
 
 ### Setting Up Development Environment
 
-1. Clone the repository
-2. Create a virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # Linux/Mac
-   # or
-   .venv\Scripts\activate  # Windows
-   ```
-3. Install development dependencies:
-   ```bash
-   # Install the package in development mode with all dev dependencies
-   pip install -e ".[dev]"
-   
-   # Or install from requirements file
-   pip install -r requirements-dev.txt
-   ```
+Simply run the start script to set up your development environment:
+
+```bash
+./start.sh
+```
+
+This script will:
+- Create a virtual environment
+- Install all development dependencies
+- Set up pre-commit hooks
+- Run initial code formatting
+- Run tests to verify the installation
 
 ### Running Tests
 
@@ -316,5 +295,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## References
 
-- [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa -api-v1-1-0.html)
+- [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa-api-v1-1-0.html)
 - [Original Go Client](https://github.com/OpenVPN/cloudconnexa-go-client)
