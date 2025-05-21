@@ -2,6 +2,15 @@
 
 A Python client for the Cloud Connexa API, providing a simple and intuitive interface for managing Cloud Connexa resources.
 
+## Quick Start
+
+```bash
+# First-time setup made easy
+./start.sh
+```
+
+This script will help you set up the development environment and run tests to verify your installation.
+
 ## Quick Reference
 
 ```python
@@ -309,11 +318,8 @@ For contribution guidelines, see [Development Documentation](docs/development/RE
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+This project is free and open-source, licensed under the MIT license. See the LICENSE file for details.
 
-## Security
-
-For security issues, please email security@openvpn.net instead of posting a public issue on GitHub.
 
 ## References
 
