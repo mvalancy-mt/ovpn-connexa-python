@@ -52,6 +52,14 @@ This directory contains rules that guide AI behavior in this project. Each rule 
   - Maintains documentation standards
   - Guides communication practices
 
+### `git-workflow.mdc`
+- **Purpose**: Defines git practices for agentic development
+- **Justification**:
+  - Ensures consistent commit messages
+  - Maintains clean git history
+  - Guides commit structure
+  - Preserves change context
+
 ## Context-Specific Rules (Auto-Attached)
 
 ### `documentation-visual.mdc`
@@ -80,6 +88,7 @@ These rules are always included in the AI context to ensure consistent behavior:
 - Code quality
 - TDD workflow
 - AI guidelines
+- Git workflow
 
 ### Auto-Attached
 These rules are included based on the context of the files being worked with:
