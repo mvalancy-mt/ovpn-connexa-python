@@ -5,6 +5,7 @@ This module provides functionality to detect which API version is available
 on the server and handles fallback to older versions when necessary.
 """
 import logging
+import re
 from typing import Optional, Union
 
 import requests
@@ -38,9 +39,16 @@ class VersionDetector:
             
         Returns:
             str: Detected API version ("1.0" or "1.1.0")
+            
+        Raises:
+            ValueError: If the preferred version is invalid
         """
-        # If a specific version is requested, use that
-        if preferred_version in ["1.0", "1.1.0"]:
+        # If a specific version is requested, validate it
+        if preferred_version:
+            if not re.match(r'^v?\d+\.\d+(\.\d+)?$', preferred_version):
+                raise ValueError("Invalid API version format. Expected format: v1.0 or 1.0")
+            if preferred_version not in ["1.0", "1.1.0"]:
+                raise ValueError("Unsupported API version. Supported versions: 1.0, 1.1.0")
             logger.info(f"Using explicitly requested API version: {preferred_version}")
             return preferred_version
             

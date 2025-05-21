@@ -113,15 +113,38 @@ class VersionCompatibilityError(CloudConnexaError):
 class ResourceNotFoundError(APIError):
     """Error raised when a resource is not found."""
     
-    def __init__(self, resource_type: str, resource_id: str, **kwargs):
+    def __init__(self, message: str = None, resource_id: str = None, resource_type: str = "Resource", **kwargs):
         """Initialize the resource not found error.
         
         Args:
+            message: Error message (optional)
             resource_type: Type of resource
             resource_id: ID of resource
             **kwargs: Additional error context
         """
-        message = f"{resource_type} with ID '{resource_id}' not found"
+        if message is None:
+            message = f"{resource_type} with ID '{resource_id}' not found"
         super().__init__(message, status_code=404, **kwargs)
         self.resource_type = resource_type
         self.resource_id = resource_id
+
+
+class ValidationError(APIError):
+    """Error raised when input validation fails."""
+    def __init__(self, message: str, status_code: int = 400, **kwargs):
+        super().__init__(message, status_code=status_code, **kwargs)
+
+
+class RateLimitError(APIError):
+    """Error raised when rate limit is exceeded."""
+    
+    def __init__(self, message: str, retry_after: Optional[int] = None, **kwargs):
+        """Initialize the rate limit error.
+        
+        Args:
+            message: Error message
+            retry_after: Number of seconds to wait before retrying
+            **kwargs: Additional error context
+        """
+        super().__init__(message, status_code=429, **kwargs)
+        self.retry_after = retry_after
