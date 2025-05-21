@@ -55,34 +55,8 @@ run_step() {
     echo -e "${RED}${BOLD}║                  ERROR DURING ${step_name^^}                  ║${RESET}"
     echo -e "${RED}${BOLD}╚═════════════════════════════════════════════════════════════════╝${RESET}"
     echo
-    echo -e "${YELLOW}${BOLD}Troubleshooting suggestions:${RESET}"
-    
-    case "$step_num" in
-      "2")
-        echo -e "${CYAN}• Make sure you have Python 3.6+ installed${RESET}"
-        echo -e "${CYAN}• Check if your system has the required development packages${RESET}"
-        echo -e "${CYAN}• Try running 'make setup' manually to see detailed error messages${RESET}"
-        ;;
-      "3")
-        echo -e "${CYAN}• If you're seeing import errors, the project structure might need fixes${RESET}"
-        echo -e "${CYAN}• Check the src/cloudconnexa/ directory structure${RESET}"
-        echo -e "${CYAN}• Ensure the CloudConnexaClient class is correctly implemented${RESET}"
-        echo -e "${CYAN}• Try running 'make test' manually to see more detailed error messages${RESET}"
-        ;;
-      *)
-        echo -e "${CYAN}• Check the error messages above for more details${RESET}"
-        echo -e "${CYAN}• Try running the command manually: ${command}${RESET}"
-        ;;
-    esac
-    
-    echo
-    echo -e "${YELLOW}Would you like to continue with the next steps? (y/n)${RESET}"
-    read -r continue_choice
-    if [[ "$continue_choice" != "y" ]]; then
-      echo -e "${RED}Setup aborted.${RESET}"
-      exit 1
-    fi
-    echo
+    echo -e "${YELLOW}Setup aborted due to errors.${RESET}"
+    exit 1
   fi
 }
 
