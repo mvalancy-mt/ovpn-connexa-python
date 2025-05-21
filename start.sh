@@ -44,13 +44,16 @@ run_step() {
   local step_name=$2
   local command=$3
   
-  echo -e "${BLUE}${BOLD}[STEP ${step_num}/4] ${step_name}...${RESET}"
+  echo -e "${CYAN}${BOLD}╔═════════════════════════════════════════════════════════════════╗${RESET}"
+  echo -e "${CYAN}${BOLD}║                         RUNNING ${step_name^^}                    ║${RESET}"
+  echo -e "${CYAN}${BOLD}╚═════════════════════════════════════════════════════════════════╝${RESET}"
+  echo
+  
   if eval "$command"; then
-    echo -e "${GREEN}✓ ${step_name} completed successfully${RESET}"
+    echo -e "${GREEN}${BOLD}✓ ${step_name} completed successfully${RESET}"
     echo
     return 0
   else
-    echo
     echo -e "${RED}${BOLD}╔═════════════════════════════════════════════════════════════════╗${RESET}"
     echo -e "${RED}${BOLD}║                  ERROR DURING ${step_name^^}                  ║${RESET}"
     echo -e "${RED}${BOLD}╚═════════════════════════════════════════════════════════════════╝${RESET}"
@@ -68,6 +71,25 @@ run_step "2" "Setting up development environment" "make setup"
 
 # Step 3: Run tests
 run_step "3" "Running tests to verify installation" "make test"
+
+# After tests complete successfully, show information about real tests
+echo -e "${CYAN}${BOLD}╔═════════════════════════════════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}${BOLD}║                    REAL API TEST INFORMATION                    ║${RESET}"
+echo -e "${CYAN}${BOLD}╚═════════════════════════════════════════════════════════════════╝${RESET}"
+echo
+echo -e "${YELLOW}${BOLD}Note:${RESET} Some tests were skipped because they require real API credentials."
+echo
+echo -e "${YELLOW}${BOLD}To run real API tests:${RESET}"
+echo -e "1. Create a ${CYAN}.env${RESET} file in the project root with:"
+echo -e "   ${CYAN}CLOUDCONNEXA_API_URL=your_api_url${RESET}"
+echo -e "   ${CYAN}CLOUDCONNEXA_CLIENT_ID=your_client_id${RESET}"
+echo -e "   ${CYAN}CLOUDCONNEXA_CLIENT_SECRET=your_client_secret${RESET}"
+echo
+echo -e "2. Run the tests again with:"
+echo -e "   ${CYAN}make test${RESET}"
+echo
+echo -e "${GREEN}${BOLD}✓ All steps completed successfully!${RESET}"
+echo
 
 # Step 4: Next steps
 echo -e "${BLUE}${BOLD}[STEP 4/4] Setup complete!${RESET}"
