@@ -1,204 +1,133 @@
 # Cloud Connexa Python Client
 
-A Python client for the Cloud Connexa API, providing a simple and intuitive interface for managing Cloud Connexa resources.
+A Python client library for interacting with the Cloud Connexa API. This client provides a simple and intuitive interface for managing networks, users, DNS records, and other Cloud Connexa resources.
+
+## Overview
+
+Cloud Connexa is a secure networking platform that enables organizations to manage remote access and site-to-site connections. It provides a centralized way to:
+
+- Connect remote users to corporate resources
+- Link branch offices and data centers
+- Manage access control and security policies
+- Monitor network activity and performance
+
+```mermaid
+graph TD
+    subgraph "Cloud Connexa Platform"
+        CC[Cloud Connexa API]
+        NS[Network Service]
+        US[User Service]
+        DS[DNS Service]
+    end
+
+    subgraph "Remote Users"
+        U1[User 1]
+        U2[User 2]
+        U3[User 3]
+    end
+
+    subgraph "Corporate Resources"
+        R1[Internal Apps]
+        R2[Databases]
+        R3[File Servers]
+    end
+
+    subgraph "Branch Offices"
+        B1[Office 1]
+        B2[Office 2]
+    end
+
+    %% User Connections
+    U1 -->|VPN| CC
+    U2 -->|VPN| CC
+    U3 -->|VPN| CC
+
+    %% Resource Access
+    CC -->|Secure Tunnel| R1
+    CC -->|Secure Tunnel| R2
+    CC -->|Secure Tunnel| R3
+
+    %% Branch Office Connections
+    B1 -->|Site-to-Site| CC
+    B2 -->|Site-to-Site| CC
+
+    %% Service Management
+    CC --> NS
+    CC --> US
+    CC --> DS
+
+    %% Access Control
+    US -->|User Groups| U1
+    US -->|User Groups| U2
+    US -->|User Groups| U3
+
+    %% Network Management
+    NS -->|Network Policies| B1
+    NS -->|Network Policies| B2
+    NS -->|Access Rules| R1
+    NS -->|Access Rules| R2
+    NS -->|Access Rules| R3
+
+    %% DNS Management
+    DS -->|DNS Records| B1
+    DS -->|DNS Records| B2
+```
+
+This Python client provides programmatic access to all Cloud Connexa features, allowing you to:
+
+1. **Manage Networks**
+   - Create and configure secure networks
+   - Set up site-to-site connections
+   - Define routing policies
+
+2. **Control Access**
+   - Manage user accounts and groups
+   - Configure access policies
+   - Monitor user activity
+
+3. **Handle DNS**
+   - Manage DNS records for networks
+   - Configure DNS resolution
+   - Update DNS settings
+
+4. **Monitor & Maintain**
+   - Track network performance
+   - View connection status
+   - Manage security settings
 
 ## Quick Start
 
-```bash
-# First-time setup made easy
-./start.sh
-```
-
-This script will help you set up the development environment and run tests to verify your installation.
-
-## Quick Reference
-
-```python
-# Authentication
-from cloudconnexa import CloudConnexaClient
-client = CloudConnexaClient(
-    api_url="https://your-cloud-id.api.openvpn.com",
-    client_id="your-client-id",
-    client_secret="your-client-secret"
-)
-
-# API Version Compatibility (supports both v1.0 and v1.1.0)
-client_default = CloudConnexaClient(...)  # Uses latest version (1.1.0) by default
-client_v1 = CloudConnexaClient(..., api_version="1.0")  # Explicitly use v1.0
-print(f"Using API version: {client.api_version}")  # Check current version
-
-# Common operations
-networks = client.networks.list()                  # List all networks
-users = client.users.list()                        # List all users
-groups = client.user_groups.list()                 # List all user groups
-connectors = client.connectors.list(network_id)    # List network connectors
-routes = client.routes.list(network_id, connector_id)  # List connector routes
-profiles = client.profiles.list(user_id)           # List user VPN profiles
-audit_logs = client.audit_logs.list()              # Get audit logs for monitoring
-connections = client.connections.list(network_id)  # View active VPN connections
-```
-
-## Developer Story: Automating Project Team VPN Access
-
-A common business need is granting secure VPN access to project teams, then revoking access when the project completes. Here's how to automate this workflow:
-
-```python
-import os
-from cloudconnexa import CloudConnexaClient
-
-# Initialize the client
-client = CloudConnexaClient(
-    api_url=os.environ.get("CLOUDCONNEXA_API_URL"),
-    client_id=os.environ.get("CLOUDCONNEXA_CLIENT_ID"),
-    client_secret=os.environ.get("CLOUDCONNEXA_CLIENT_SECRET")
-)
-
-# 1. Create a project-specific network
-project_network = client.networks.create(
-    name="Project-Alpha",
-    description="Secure network for Project Alpha team",
-    internet_access="split_tunnel_on"
-)
-
-# 2. Create a user group for the project team
-team_group = client.user_groups.create(name="Project-Alpha-Team")
-
-# 3. Grant the group access to the network
-client.network_accesses.create(
-    network_id=project_network.id,
-    group_id=team_group.id
-)
-
-# 4. Add team members to the group
-team_members = ["alice@example.com", "bob@example.com", "charlie@example.com"]
-for email in team_members:
-    # Find or create the user
-    users = [u for u in client.users.list() if u.email.lower() == email.lower()]
-    user = users[0] if users else client.users.create(
-        email=email,
-        first_name=email.split("@")[0],  # Simple placeholder
-        last_name="",
-        role="member"
-    )
-    
-    # Add to project group
-    client.user_groups.add_user(
-        group_id=team_group.id,
-        user_id=user.id
-    )
-    
-    # Generate VPN profile
-    profile = client.profiles.create(
-        user_id=user.id,
-        network_id=project_network.id,
-        name=f"Project-Alpha-{email.split('@')[0]}"
-    )
-    print(f"Created profile for {email}: {profile.name}")
-
-# When project ends:
-# client.user_groups.delete(group_id=team_group.id)
-# client.networks.delete(network_id=project_network.id)
-```
-
-This example demonstrates creating a network, managing group-based access, and generating VPN profiles - all common tasks for securing project resources.
-
-## Getting Started
-
-### Authentication
-
-First, obtain API credentials from the CloudConnexa Administration portal:
-
-1. Log in to your Administration portal (e.g., `https://your-company.openvpn.com`)
-2. Navigate to **API & Logs > API**
-3. Click **Create Credentials**
-4. Copy and securely store your Client ID and Client Secret
-5. Enable the API using the toggle button
-
-Then use these credentials to initialize the client:
-
 ```python
 from cloudconnexa import CloudConnexaClient
-import os
 
-# Initialize client with secure credential handling
+# Initialize client with environment variables
+client = CloudConnexaClient()
+
+# Or with explicit configuration
 client = CloudConnexaClient(
-    api_url=os.getenv("CLOUDCONNEXA_API_URL"),      # https://your-cloud-id.api.openvpn.com
-    client_id=os.getenv("CLOUDCONNEXA_CLIENT_ID"),  # Your API client ID
-    client_secret=os.getenv("CLOUDCONNEXA_CLIENT_SECRET")  # Your API client secret
+    api_url="https://api.cloudconnexa.com",
+    client_id="your_client_id",
+    client_secret="your_client_secret",
+    api_version="1.1.0"  # Optional, defaults to latest
 )
-```
 
-### Basic Operations
-
-Once authenticated, you can manage your Cloud Connexa resources:
-
-```python
 # List networks
 networks = client.networks.list()
-print(f"Found {len(networks)} networks")
+for network in networks["data"]:
+    print(f"Network: {network.name}")
 
 # Create a new network
-network = client.networks.create(
-    name="test-network",
-    description="Test network created via API",
-    internet_access="split_tunnel_on",
-    egress=True
+new_network = client.networks.create(
+    name="My Network",
+    description="A test network"
 )
-print(f"Created network: {network.name} (ID: {network.id})")
-
-# Create a connector in the network
-connector = client.connectors.create(
-    network_id=network.id,
-    name="test-connector",
-    vpn_region="us-east-1"  # Use client.vpn_regions.list() to get available regions
-)
-print(f"Created connector: {connector.name} (ID: {connector.id})")
-
-# Add a route to the connector
-route = client.routes.create(
-    network_id=network.id,
-    connector_id=connector.id,
-    cidr="10.0.0.0/8",
-    description="Internal network"
-)
-print(f"Added route: {route.cidr}")
 ```
-
-For more comprehensive examples, check our developer guides below.
-
-### Developer Guides
-
-We provide guides for common VPN administration tasks:
-
-#### [Common VPN Operations](docs/examples/common_tasks.md)
-Task-focused guides for everyday VPN management:
-
-| Task | Description | Guide Section |
-|------|-------------|--------------|
-| 🔑 **Access Control** | Grant/revoke network access to users and groups | [VPN Access Control](docs/examples/common_tasks.md#9-vpn-access-control-management) |
-| 👤 **User Onboarding** | Add users and assign them to groups | [User Onboarding](docs/examples/common_tasks.md#1-user-onboarding-workflow) |
-| 📱 **Client Profiles** | Generate and distribute VPN configurations | [Profile Management](docs/examples/common_tasks.md#10-vpn-client-profile-management) |
-| 🔍 **Audit & Monitoring** | Track activity and view connections | [Audit Logs](docs/examples/common_tasks.md#11-audit-logs-and-usage-monitoring) |
-| 🌐 **Network Setup** | Create and configure networks | [Network Configuration](docs/examples/common_tasks.md#2-network-configuration-management) |
-| 🔄 **Identity Integration** | Sync with SCIM providers and HR systems | [Identity Provider Integration](docs/examples/common_tasks.md#12-identity-provider-integration-and-user-provisioning) |
-
-#### [Security and Automation Guides](docs/examples/)
-
-Additional guides for specific scenarios:
-
-* [**Security & Troubleshooting**](docs/examples/security_troubleshooting.md): Emergency access revocation, key rotation, and security audits
-* [**Automation & Infrastructure as Code**](docs/examples/automation_iac.md): Terraform, CI/CD, and Kubernetes integration
-* [**API Integration Patterns**](docs/examples/api_integration_patterns.md): Web services, serverless functions, and microservices integration
-* [**Monitoring & Observability**](docs/examples/monitoring_observability.md): Setting up metrics collection and alerts
-* [**API Version Compatibility**](docs/examples/api_versioning.md): Working with both v1.0 and v1.1.0 API versions seamlessly
-
-For the full list of guides, see our [Examples Documentation](docs/examples/README.md).
 
 ## Installation
 
 ### From PyPI
 ```bash
-pip install ovpn-connexa
+pip install cloudconnexa
 ```
 
 ### From Source
@@ -214,40 +143,29 @@ git submodule add https://github.com/yourusername/ovpn-connexa.git libs/ovpn-con
 git submodule update --init --recursive
 ```
 
-For detailed installation instructions, see [Development Documentation](docs/development/README.md).
+## Configuration
 
-## Project Documentation
+The client can be configured using environment variables or by passing parameters directly:
 
-The project documentation is organized into the following sections:
+Required environment variables:
+- `CLOUDCONNEXA_API_URL`: Base URL for the API
+- `CLOUDCONNEXA_CLIENT_ID`: Your client ID
+- `CLOUDCONNEXA_CLIENT_SECRET`: Your client secret
 
-- **[Examples](docs/examples/README.md)** - Usage examples for common and advanced scenarios
-- **[API Documentation](docs/api/README.md)** - API endpoints and usage
-- **[Architecture](docs/architecture/README.md)** - Design decisions and patterns
-- **[Development](docs/development/README.md)** - Setup and contributing guides
-- **[Testing](docs/testing/README.md)** - Testing strategy and specifications
+```python
+# Using environment variables
+client = CloudConnexaClient()
 
-## Project Overview
-
-This library provides a Python interface to the Cloud Connexa API, allowing developers to programmatically manage their Cloud Connexa resources. The library is designed to be easy to use while providing complete coverage of the Cloud Connexa API functionality.
-
-## Architecture
-
-```mermaid
-graph TD
-    A[Client Application] --> B[CloudConnexaClient]
-    B --> C[Authentication]
-    B --> D[API Services]
-    D --> E[Network Service]
-    D --> F[User Service]
-    D --> G[Route Service]
-    D --> H[VPN Region Service]
-    C --> I[Token Management]
-    C --> J[Rate Limiting]
-    B --> K[Error Handling]
-    B --> L[Logging]
+# Or with explicit configuration
+client = CloudConnexaClient(
+    api_url="https://api.cloudconnexa.com",
+    client_id="your_client_id",
+    client_secret="your_client_secret",
+    api_version="1.1.0"  # Optional, defaults to latest
+)
 ```
 
-## Key Features
+## Core Features
 
 - Complete Cloud Connexa API v1.1.0 coverage
 - Authentication and token management
@@ -260,92 +178,130 @@ graph TD
 - Comprehensive error handling
 - Rate limiting and security features
 
-For detailed feature information, see [API Documentation](docs/api/README.md).
+## Available Services
+
+### Networks
+- `list()`: List all networks
+- `create(name, **kwargs)`: Create a new network
+- `get(network_id)`: Get network details
+- `update(network_id, **kwargs)`: Update network
+- `delete(network_id)`: Delete network
+
+### Users
+- `list()`: List all users
+- `create(email, **kwargs)`: Create a new user
+- `get(user_id)`: Get user details
+- `update(user_id, **kwargs)`: Update user
+- `delete(user_id)`: Delete user
+
+### DNS
+- `list()`: List DNS records
+- `create(domain, **kwargs)`: Create DNS record
+- `get(record_id)`: Get DNS record
+- `update(record_id, **kwargs)`: Update DNS record
+- `delete(record_id)`: Delete DNS record
+
+### User Groups
+- `list()`: List user groups
+- `create(name, **kwargs)`: Create user group
+- `get(group_id)`: Get group details
+- `update(group_id, **kwargs)`: Update group
+- `delete(group_id)`: Delete group
+
+### IP Services
+- `list()`: List IP services
+- `create(**kwargs)`: Create IP service
+- `get(service_id)`: Get service details
+- `update(service_id, **kwargs)`: Update service
+- `delete(service_id)`: Delete service
+
+## Error Handling
+
+The client uses custom exceptions for different error cases:
+
+```python
+from cloudconnexa.utils.errors import (
+    APIError,
+    AuthenticationError,
+    ConfigurationError,
+    ResourceNotFoundError,
+    ValidationError,
+    RateLimitError
+)
+
+try:
+    network = client.networks.get("non-existent-id")
+except ResourceNotFoundError as e:
+    print(f"Network not found: {e}")
+except APIError as e:
+    print(f"API error: {e}")
+```
 
 ## Project Structure
 
-The project follows a clean, modular structure with:
+```
+cloudconnexa/
+├── client/           # Core client implementation
+├── services/         # API service implementations
+│   ├── networks/     # Network management
+│   ├── users/        # User management
+│   ├── dns/         # DNS record management
+│   ├── ip_services/ # IP service management
+│   └── user_groups/ # User group management
+├── models/          # Data models
+├── utils/           # Utilities and helpers
+└── exceptions.py    # Custom exceptions
+```
 
-- `src/cloudconnexa/` - Main package with client, services, and models
-  - `client/` - API client with version detection and authentication
-  - `models/` - Data models for DNS records, user groups, and IP services
-  - `services/` - Service implementations with version compatibility
-  - `utils/` - Utilities for error handling, validation, and version management
-- `tests/` - Comprehensive test suite
-  - `unit/` - Unit tests for individual components
-  - `integration/` - Integration tests for API version compatibility
-  - `functional/` - Real-world functional tests
-- `docs/` - Comprehensive documentation
-  - `api/` - API reference documentation
-  - `examples/` - Usage examples for common and advanced scenarios
-  - `testing/` - Testing strategy and specifications
-  - `planning/` - Project plans, status reports, and version migration guides
-    - [`status.md`](docs/planning/status.md) - Current project status and roadmap
+## Documentation
 
-This structure ensures clear separation of concerns and makes the version compatibility features easy to maintain across the codebase.
+- [API Reference](docs/api/README.md)
+- [Examples](docs/examples/README.md)
+- [Architecture](docs/architecture/README.md)
+- [Development Guide](docs/development/README.md)
+- [Testing Guide](docs/testing/README.md)
 
-For detailed structure, see [Development Documentation](docs/development/README.md).
+## Development
 
-## Project Status
+### Setting Up Development Environment
 
-For the current project status, roadmap, and timeline, see our [Project Status](docs/planning/status.md) document.
+1. Clone the repository
+2. Create a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # Linux/Mac
+   # or
+   .venv\Scripts\activate  # Windows
+   ```
+3. Install development dependencies:
+   ```bash
+   pip install -e ".[dev]"
+   ```
 
-## Security Features
+### Running Tests
 
-- Secure credential management
-- Request signing for API authentication
-- TLS/SSL verification
-- Input validation and sanitization
-- Protection against common security vulnerabilities
+```bash
+pytest
+```
 
-For detailed security information, see [Security Architecture](docs/architecture/security.md).
+### Code Style
 
-## Testing
+We use black for code formatting and flake8 for linting:
 
-The project uses pytest for comprehensive testing including:
-
-- Component tests for core functionality
-- Cross-component integration tests
-- API version compatibility tests
-
-For testing details, see [Testing Documentation](docs/testing/README.md).
+```bash
+black .
+flake8
+```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-For contribution guidelines, see [Development Documentation](docs/development/README.md).
-
 ## License
 
-This project is free and open-source, licensed under the MIT license. See the LICENSE file for details.
-
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## References
 
 - [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa-api-v1-1-0.html)
 - [Original Go Client](https://github.com/OpenVPN/cloudconnexa-go-client)
-
-## Authentication Setup
-
-You can provide your Cloud Connexa API credentials in two ways:
-
-### 1. Environment Variables
-
-Set the following environment variables in your shell:
-
-```
-export CLOUDCONNEXA_API_URL="https://your-cloud-id.api.openvpn.com"
-export CLOUDCONNEXA_CLIENT_ID="your-client-id"
-export CLOUDCONNEXA_CLIENT_SECRET="your-client-secret"
-```
-
-### 2. .env File (Recommended for Local Development)
-
-1. Copy `.env.sample` to `.env`:
-   ```
-   cp .env.sample .env
-   ```
-2. Edit `.env` and fill in your real credentials.
-
-The client will automatically load these credentials if you do not pass them as arguments. 
