@@ -80,12 +80,15 @@ echo
 echo -e "${YELLOW}${BOLD}Note:${RESET} Some tests were skipped because they require real API credentials."
 echo
 echo -e "${YELLOW}${BOLD}To run real API tests:${RESET}"
-echo -e "1. Create a ${CYAN}.env${RESET} file in the project root with:"
+echo -e "1. Copy ${CYAN}.env.sample${RESET} to ${CYAN}.env${RESET} in the project root:"
+echo -e "   ${CYAN}cp .env.sample .env${RESET}"
+echo
+echo -e "2. Edit ${CYAN}.env${RESET} and fill in your credentials:"
 echo -e "   ${CYAN}CLOUDCONNEXA_API_URL=your_api_url${RESET}"
 echo -e "   ${CYAN}CLOUDCONNEXA_CLIENT_ID=your_client_id${RESET}"
 echo -e "   ${CYAN}CLOUDCONNEXA_CLIENT_SECRET=your_client_secret${RESET}"
 echo
-echo -e "2. Run the tests again with:"
+echo -e "3. Run the tests again with:"
 echo -e "   ${CYAN}make test${RESET}"
 echo
 echo -e "${GREEN}${BOLD}✓ All steps completed successfully!${RESET}"
