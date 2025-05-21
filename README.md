@@ -275,7 +275,11 @@ cloudconnexa/
    ```
 3. Install development dependencies:
    ```bash
+   # Install the package in development mode with all dev dependencies
    pip install -e ".[dev]"
+   
+   # Or install from requirements file
+   pip install -r requirements-dev.txt
    ```
 
 ### Running Tests
@@ -286,11 +290,20 @@ pytest
 
 ### Code Style
 
-We use black for code formatting and flake8 for linting:
+We use black for code formatting and flake8 for linting. These tools are installed as part of the development dependencies.
 
 ```bash
+# Format code
 black .
+
+# Check code style
 flake8
+```
+
+You can also set up pre-commit hooks to automatically run these checks before each commit:
+
+```bash
+pre-commit install
 ```
 
 ## Contributing
@@ -303,5 +316,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## References
 
-- [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa-api-v1-1-0.html)
+- [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa -api-v1-1-0.html)
 - [Original Go Client](https://github.com/OpenVPN/cloudconnexa-go-client)
