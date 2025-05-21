@@ -324,4 +324,28 @@ This project is free and open-source, licensed under the MIT license. See the LI
 ## References
 
 - [Cloud Connexa API Documentation](https://openvpn.net/cloud-docs/developer/cloudconnexa-api-v1-1-0.html)
-- [Original Go Client](https://github.com/OpenVPN/cloudconnexa-go-client) 
+- [Original Go Client](https://github.com/OpenVPN/cloudconnexa-go-client)
+
+## Authentication Setup
+
+You can provide your Cloud Connexa API credentials in two ways:
+
+### 1. Environment Variables
+
+Set the following environment variables in your shell:
+
+```
+export CLOUDCONNEXA_API_URL="https://your-cloud-id.api.openvpn.com"
+export CLOUDCONNEXA_CLIENT_ID="your-client-id"
+export CLOUDCONNEXA_CLIENT_SECRET="your-client-secret"
+```
+
+### 2. .env File (Recommended for Local Development)
+
+1. Copy `.env.sample` to `.env`:
+   ```
+   cp .env.sample .env
+   ```
+2. Edit `.env` and fill in your real credentials.
+
+The client will automatically load these credentials if you do not pass them as arguments. 
